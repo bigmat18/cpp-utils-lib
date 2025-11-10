@@ -2,7 +2,7 @@
 #define UTILS_H
 
 // Debugging helpers and assertions
-//#include "debug.hpp"
+#include "debug.hpp"
 
 // Logging utilities (file/console logging, log levels, etc.)
 #include "logging.hpp"
