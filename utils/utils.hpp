@@ -5,7 +5,7 @@
 //#include "debug.hpp"
 
 // Logging utilities (file/console logging, log levels, etc.)
-//#include "logging.hpp"
+#include "logging.hpp"
 
 // Custom assertion macros and stacktrace support
 #include "massert.hpp"

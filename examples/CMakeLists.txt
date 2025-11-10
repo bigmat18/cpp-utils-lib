@@ -5,9 +5,9 @@ project(cpp-utils-lib-examples)
 message(STATUS "Building examples")
 set(EXAMPLES 
     01-assert
-    02-debug
+    02-logging
     03-profiling
-    04-logging
+    04-debug
 )
 
 foreach (subdir ${EXAMPLES})
