@@ -11,6 +11,6 @@
 #include "massert.hpp"
 
 // Profiling tools (timers, performance measurement, etc.)
-//#include "profiling.hpp"
+#include "profiling.hpp"
 
 #endif // !UTILS_H

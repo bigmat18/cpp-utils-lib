@@ -13,7 +13,6 @@
 
 #if __has_include(<stacktrace>) 
     #include <stacktrace>
-    #pragma message("<stacktrace> is available — stack dumps enabled")
 #else
     #pragma message("<stacktrace> not available — stack dumps will be disabled")
 #endif
