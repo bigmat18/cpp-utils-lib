@@ -1,0 +1,33 @@
+# Build directories
+build/
+_build/
+out/
+dist/
+.cache/
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Visual Studio
+.vs/
+.vscode/
+*.vcproj.user
+*.sln.docstates
+*.suo
+*.ncb
+*.user
+*.userosscache
+*.VC.db
+*.VC.VC.opendb
