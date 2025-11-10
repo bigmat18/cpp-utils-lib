@@ -23,7 +23,7 @@ public:
     static inline void Check(bool condition, 
                              const std::string expr, 
                              const std::string& message, 
-                             const std::source_location& location) 
+                             [[maybe_unused]] const std::source_location& location) 
     {
         if (!condition) {
             std::lock_guard<std::mutex> lock(sMutex);

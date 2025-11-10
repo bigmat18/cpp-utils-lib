@@ -26,7 +26,7 @@ class Debug {
 public:
     template <bool stop = true, typename... Args>
     static inline void Breakpoint(
-        const std::source_location& location,
+        [[maybe_unused]] const std::source_location& location,
         const bool condition = true,
         const std::string expr = "", 
         const Args&... args 
