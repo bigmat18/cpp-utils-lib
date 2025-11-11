@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include "debug.hpp"
 #include "massert.hpp"
 
 struct ProfNode {
@@ -114,18 +115,30 @@ class Profiling {
     std::shared_ptr<ProfNode> mNode;
 
 public:
-    Profiling(const std::string& msg = "")
-        : mMsg(msg), mStart(std::chrono::high_resolution_clock::now())
+    Profiling(const std::string& name = "")
+        : mMsg(name), mStart(std::chrono::high_resolution_clock::now())
     {
-        auto child = std::make_shared<ProfNode>(msg);
-        if (!__LocalProfilingStack.empty()) {
-            auto parent = __LocalProfilingStack.back();
-            parent->mChildren.push_back(child);
+        if (__LocalProfilingStack.empty()) {
+            mNode = std::make_shared<ProfNode>(name);
+            __LocalProfilingRoot = mNode;
         } else {
-            __LocalProfilingRoot = child;
+            auto parent = __LocalProfilingStack.back();
+            bool sameChildrenFound = false;
+
+            for (auto& child : parent->mChildren) {
+                if (child->mName == name) {
+                    sameChildrenFound = true;
+                    mNode = child;
+                }
+            }
+
+            if (!sameChildrenFound) {
+                mNode = std::make_shared<ProfNode>(name);
+                parent->mChildren.push_back(mNode);
+            }
         }
-        __LocalProfilingStack.push_back(child);
-        mNode = child;
+
+        __LocalProfilingStack.push_back(mNode);
     }
 
     ~Profiling()

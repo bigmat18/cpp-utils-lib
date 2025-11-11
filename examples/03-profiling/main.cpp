@@ -18,6 +18,11 @@ int main (void) {
             }
             sleep(2);
         }
+
+        {
+            PROFILING_SCOPE("Test2");
+            sleep(1);
+        }
     }
     PROFILING_PRINT();
     return 0;

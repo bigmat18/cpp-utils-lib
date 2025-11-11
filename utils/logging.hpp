@@ -28,14 +28,16 @@ inline std::string __GetCurrentTimestamp() {
     return timestamp_buffer;
 }
 
+namespace fs = std::filesystem;
+
 class Logging {
 
     static inline std::mutex s_Mutex;
     static inline bool s_IsInit = false;
 
     std::ostringstream m_Buffer; 
-    std::filesystem::path m_Filename = "file.log";
-    std::filesystem::path m_Dir = std::filesystem::current_path() / "logs"; 
+    fs::path m_Filename = "file.log";
+    fs::path m_Dir = fs::current_path() / "logs"; 
 
     static Logging& instance() {
         static Logging loggingSystem;
@@ -43,7 +45,7 @@ class Logging {
     }
 
 public:
-    static void initialize(std::filesystem::path dir = std::filesystem::current_path() / "logs")
+    static void initialize(fs::path dir = fs::current_path() / "logs")
     {
         std::lock_guard<std::mutex> lock(s_Mutex);
         if (!s_IsInit) {
@@ -60,11 +62,11 @@ public:
 
     static void shutdown() {
         if (s_IsInit) {
-            if (!std::filesystem::exists(instance().m_Dir)) {
-                std::filesystem::create_directories(instance().m_Dir);
+            if (!fs::exists(instance().m_Dir)) {
+                fs::create_directories(instance().m_Dir);
             }
 
-            std::filesystem::path fullPath = instance().m_Dir / instance().m_Filename;
+            fs::path fullPath = instance().m_Dir / instance().m_Filename;
             std::ofstream file(fullPath);
             massert(file.is_open(), "Error during opens of " + fullPath.string());
 
