@@ -13,4 +13,6 @@
 // Profiling tools (timers, performance measurement, etc.)
 #include "profiling.hpp"
 
+#include "formatter.hpp"
+
 #endif // !UTILS_H

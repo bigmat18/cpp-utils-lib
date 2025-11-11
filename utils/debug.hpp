@@ -3,13 +3,14 @@
 #include <iostream>
 #include <ostream>
 #include <sstream>
-#include <vector>
 #include <string>
 #include <utility>
 #include <limits>
 #include <source_location>
 #include <mutex>
 #include <thread>
+#include <format>
+#include "formatter.hpp"
 
 
 #ifdef _OPENMP
@@ -22,9 +23,11 @@
     #pragma message("<stacktrace> not available — stack dumps will be disabled")
 #endif
 
+
 class Debug {
+
 public:
-    template <bool stop = true, typename... Args>
+    template <bool stop = true, typename... Args> requires AllFormattable<Args...>
     static inline void Breakpoint(
         [[maybe_unused]] const std::source_location& location,
         const bool condition = true,
@@ -61,31 +64,16 @@ public:
 
 private:
     static inline std::mutex sMutex;
-
-    template <typename T>
-    static std::ostringstream PrintVariable(const std::pair<std::string, std::vector<T>>& var) {
-        std::ostringstream os;
-        os << var.first
-           << " [addr: " << &var.second << "] = [";
-
-        for (size_t i = 0; i < var.second.size(); ++i) {
-            auto pair = std::make_pair(std::to_string(i), var.second[i]); 
-            os << PrintVariable(pair).str();
-            if (i + 1 < var.second.size()) os << ", ";
-        }
-        os << "]";
-        return os;
-    }
-    
+ 
     template <typename T>
     static std::ostringstream PrintVariable(const std::pair<std::string, T>& var) {
         std::ostringstream os;
-        os << var.first
+        os << type_name<T>() << " "
+           << var.first
            << " [addr: " << &var.second << "] = "
-           << var.second;
+           << std::format("{}", var.second);
         return os;
     }
-
 
     template <typename T, typename... Args>
     static std::ostringstream PrintVariables(const std::pair<std::string, T>& var, const Args&... args) {
