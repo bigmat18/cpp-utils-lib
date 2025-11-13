@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.24)
 project(cpp-utils-lib-examples)
 
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O -Wcpp -Wall -Wextra -Wpedantic" CACHE STRING "Flags for Debug" FORCE)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -flto -march=native" CACHE STRING "Flags for Release" FORCE)
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -ggdb" CACHE STRING "Flags for RelWithDebInfo" FORCE)
+set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG -flto" CACHE STRING "Flags for MinSizeRel" FORCE)
 
 message(STATUS "Building examples")
 set(EXAMPLES 

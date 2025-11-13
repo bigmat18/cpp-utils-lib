@@ -8,45 +8,54 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(EXAMPLES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/examples)
 set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils)
 
-option(BUILD_EXAMPLES "Build examples" ON)
-option(USE_OPENMP "Active openmp in utils" OFF)
+option(CPPUTILS_BUILD_EXAMPLES "Build examples" OFF)
+option(CPPUTILS_USE_OPENMP "Enable OpenMP" OFF)
+option(CPPUTILS_ENABLE_WARNINGS "Enable recommended warnings" OFF)
+option(CPPUTILS_ENABLE_ASSERT "Enable assertions" ON)
+option(CPPUTILS_ENABLE_DEBUG "Enable debug utilities" ON)
+option(CPPUTILS_ENABLE_LOGGING "Enable logging" ON)
 
-option(ENABLE_ASSERT "Example asserts utils" ON)
-option(ENABLE_DEBUG "Example debug utils" ON)
-option(ENABLE_PROFILING "Example profiling utils" ON)
-option(ENABLE_LOGGING "Example asserts utils" ON)
-
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O -Wcpp -Wall -Wextra -Wpedantic" CACHE STRING "Flags for Debug" FORCE)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -flto -march=native" CACHE STRING "Flags for Release" FORCE)
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -ggdb" CACHE STRING "Flags for RelWithDebInfo" FORCE)
-set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG -flto" CACHE STRING "Flags for MinSizeRel" FORCE)
 
 add_library(cpp-utils-lib INTERFACE)
-target_include_directories(cpp-utils-lib INTERFACE $<BUILD_INTERFACE:${UTILS_DIR}>)
+target_include_directories(cpp-utils-lib INTERFACE ${UTILS_DIR})
 target_link_libraries(cpp-utils-lib INTERFACE stdc++exp)
 
-if(USE_OPENMP AND OpenMP_CXX_FOUND)
-    target_link_libraries(cpp-utils-lib INTERFACE OpenMP::OpenMP_CXX)
-    target_compile_definitions(cpp-utils-lib INTERFACE USE_OPENMP)
+if(CPPUTILS_USE_OPENMP)
+    find_package(OpenMP QUIET)
+    if(OpenMP_CXX_FOUND)
+        target_link_libraries(cpp-utils-lib INTERFACE OpenMP::OpenMP_CXX)
+        target_compile_definitions(cpp-utils-lib INTERFACE USE_OPENMP)
+    endif()
 endif()
 
-if(ENABLE_ASSERT)
+if(CPPUTILS_ENABLE_WARNINGS)
+    target_compile_options(cpp-utils-lib INTERFACE 
+        -Wall 
+        -Wextra 
+        -Wpedantic 
+        -Wcpp 
+        $<$<CXX_COMPILER_ID:Clang>:-Weverything -Wno-c++98-compat>
+        $<$<CXX_COMPILER_ID:GNU>:-Wshadow=local -Wformat=2>
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /wd4996>
+    )
+endif()
+
+if(CPPUTILS_ENABLE_ASSERT)
     target_compile_definitions(cpp-utils-lib INTERFACE ENABLE_ASSERT)
 endif()
 
-if(ENABLE_DEBUG)
+if(CPPUTILS_ENABLE_DEBUG)
     target_compile_definitions(cpp-utils-lib INTERFACE ENABLE_DEBUG)
 endif()
 
-if(ENABLE_PROFILING)
-    target_compile_definitions(cpp-utils-lib INTERFACE ENABLE_PROFILING)
-endif()
-
-if(ENABLE_LOGGING)
+if(CPPUTILS_ENABLE_LOGGING)
     target_compile_definitions(cpp-utils-lib INTERFACE ENABLE_LOGGING)
 endif()
 
+if(CPPUTILS_ENABLE_PROFILING)
+    target_compile_definitions(cpp-utils-lib INTERFACE ENABLE_PROFILING)
+endif()
 
-if(BUILD_EXAMPLES)
+if(CPPUTILS_BUILD_EXAMPLES)
     add_subdirectory(${EXAMPLES_DIR})
 endif()
