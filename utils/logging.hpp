@@ -96,13 +96,13 @@ public:
 
 #ifdef ENABLE_LOGGING
     #ifndef NDEBUG
-        #define __INTERNAL(level_str, format, ...)                          \
+        #define __INTERNAL(level_str, color, format, ...)                   \
             do {                                                            \
                 std::string time = __GetCurrentTimestamp();                 \
                 std::string filename = __GetFileName(__FILE__);             \
                 int line = __LINE__;                                        \
                 auto msg = std::vformat(                                    \
-                    std::string("[{}][{}:{}][{}] ") + format + "\n",        \
+                    color + std::string("[{}][{}:{}][{}] ") + format + "\n",\
                     std::make_format_args(                                  \
                         time, filename, line,                               \
                         level_str, ##__VA_ARGS__));                         \
@@ -110,11 +110,11 @@ public:
                 Logging::write(msg);                                        \
             } while (0)
     #else 
-        #define __INTERNAL(level_str, format, ...)                          \
+        #define __INTERNAL(level_str, color, format, ...)                   \
             do {                                                            \
                 const char* time = __GetCurrentTimestamp().c_str();         \
                 auto msg = std::vformat(                                    \
-                    std::string("[{}][{}:{}][{}] ") + format + "\n",        \
+                    color + std::string("[{}][{}:{}][{}] ") + format + "\n",\
                     std::make_format_args(                                  \
                         time, level_str, ##__VA_ARGS__));                   \
                 std::cout << msg;                                           \
@@ -125,12 +125,12 @@ public:
 #endif // ENABLE_LOGGING 
 
 
-#define LOG_ERROR(format, ...) __INTERNAL("ERROR", format, ##__VA_ARGS__)
-#define LOG_WARN(format, ...) __INTERNAL("WARN", format, ##__VA_ARGS__)
-#define LOG_INFO(format, ...) __INTERNAL("INFO", format, ##__VA_ARGS__)
+#define LOG_ERROR(format, ...) __INTERNAL("ERROR", "\x1b[31m", format, ##__VA_ARGS__)
+#define LOG_WARN(format, ...) __INTERNAL("WARN", "\x1b[33m", format, ##__VA_ARGS__)
+#define LOG_INFO(format, ...) __INTERNAL("INFO", "\x1b[32m", format, ##__VA_ARGS__)
 
 #ifndef NDEBUG
-    #define LOG_DEBUG(format, ...) __INTERNAL("DEBUG", format, ##__VA_ARGS__)
+    #define LOG_DEBUG(format, ...) __INTERNAL("DEBUG", "\x1b[36m", format, ##__VA_ARGS__)
 #else 
     #define LOG_DEBUG(format, ...) (void(0))
 #endif // !NDEBUG
