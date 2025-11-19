@@ -105,7 +105,7 @@ public:
                     color + std::string("[{}][{}:{}][{}] ") + format + "\n",\
                     std::make_format_args(                                  \
                         time, filename, line,                               \
-                        level_str, ##__VA_ARGS__));                         \
+                        level_str, ##__VA_ARGS__)) + "\x1b[0m";             \
                 std::cout << msg;                                           \
                 Logging::write(msg);                                        \
             } while (0)
