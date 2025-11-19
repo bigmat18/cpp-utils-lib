@@ -27,7 +27,7 @@ public:
     {
         if (!condition) {
             std::lock_guard<std::mutex> lock(sMutex);
-            std::cerr << "\n[ASSERTION]\n"; 
+            std::cerr << "\n\x1b[31m[ASSERTION]\x1b[0m\n"; 
 
             std::cerr << "\t[Information]\n"; 
             std::cerr << "\t\tCondition: "<< expr  << "\n";
