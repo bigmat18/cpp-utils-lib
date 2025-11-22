@@ -19,7 +19,8 @@ option(CPPUTILS_ENABLE_LOGGING "Enable logging" ON)
 
 add_library(cpp-utils-lib INTERFACE)
 target_include_directories(cpp-utils-lib INTERFACE ${UTILS_DIR})
-target_link_libraries(cpp-utils-lib INTERFACE stdc++exp)
+target_link_libraries(cpp-utils-lib INTERFACE 
+                      $<$<STREQUAL:${CMAKE_SYSTEM_NAME},Linux>:stdc++exp>)
 
 if(CPPUTILS_USE_OPENMP)
     find_package(OpenMP QUIET)
