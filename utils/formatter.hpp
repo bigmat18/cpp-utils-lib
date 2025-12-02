@@ -16,10 +16,25 @@ concept AllFormattable = (Formattable<Ts> && ...);
 
 template <typename T>
 constexpr std::string_view type_name() {
-    std::string_view raw = __PRETTY_FUNCTION__;
-    auto start = raw.find('=') + 2;
-    auto end = raw.find(';', start);
-    return raw.substr(start, end - start);
+    #if defined (__clang__) || defined (__GNUC__)
+        std::string_view raw = __PRETTY_FUNCTION__;
+        auto start = raw.find('=') + 2;
+        auto end = raw.find(';', start);
+        return raw.substr(start, end - start);
+    #elif defined(_MSC_VER)
+        std::string_view p = __FUNCSIG__;
+
+        auto prefix = std::string_view{"type_name_impl<"};
+        auto start = p.find(prefix);
+        if (start == std::string_view::npos) {
+            return {};
+        }
+        start += prefix.size();
+        auto end = p.find('>', start);
+        return p.substr(start, end - start);
+    #else 
+        return ""    
+    #endif
 }
 
 

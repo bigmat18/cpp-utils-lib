@@ -94,44 +94,44 @@ public:
     Logging& operator=(const Logging&) = delete;
 };
 
+#if !defined (_WIN32)
+    #define RED     "\x1b[31m"
+    #define YELLOW  "\x1b[33m"
+    #define GREEN   "\x1b[32m"
+    #define BLUE    "\x1b[36m"
+    #define RESET   "\x1b[0m"
+#else
+    #define RED     ""
+    #define YELLOW  ""
+    #define GREEN   ""
+    #define BLUE    ""
+    #define RESET   ""
+#endif
+
 #ifdef ENABLE_LOGGING
-    #ifndef NDEBUG
-        #define __INTERNAL(level_str, color, format, ...)                   \
-            do {                                                            \
-                std::string time = __GetCurrentTimestamp();                 \
-                std::string filename = __GetFileName(__FILE__);             \
-                int line = __LINE__;                                        \
-                auto msg = std::vformat(                                    \
-                    color + std::string("[{}][{}:{}][{}] ") + format + "\n",\
-                    std::make_format_args(                                  \
-                        time, filename, line,                               \
-                        level_str, ##__VA_ARGS__)) + "\x1b[0m";             \
-                std::cout << msg;                                           \
-                Logging::write(msg);                                        \
-            } while (0)
-    #else 
-        #define __INTERNAL(level_str, color, format, ...)                   \
-            do {                                                            \
-                const char* time = __GetCurrentTimestamp().c_str();         \
-                auto msg = std::vformat(                                    \
-                    color + std::string("[{}][{}:{}][{}] ") + format + "\n",\
-                    std::make_format_args(                                  \
-                        time, level_str, ##__VA_ARGS__));                   \
-                std::cout << msg;                                           \
-            } while (0)
-    #endif // !NDEBUG
-#else 
-    #define __INTERNAL(level_str, format, ...) (void(0))
-#endif // ENABLE_LOGGING 
 
+    #define __INTERNAL(level_str, color, fmt, ...)                                 \
+        do {                                                                       \
+            std::string time = __GetCurrentTimestamp();                            \
+            std::string filename = __GetFileName(__FILE__);                        \
+            int line = __LINE__;                                                   \
+            std::string prefix = std::format("{}[{}][{}:{}][{}] ",                 \
+                                    color, time, filename, line, level_str);       \
+            std::string content = std::format(fmt, ##__VA_ARGS__);                 \
+            auto msg = prefix + content + "\n" + RESET;                            \
+            std::cout << msg;                                                      \
+            Logging::write(msg);                                                   \
+        } while (0)
+#else
+    #define __INTERNAL(level_str, color, fmt, ...) (void(0))
+#endif // ENABLE_LOGGING
 
-#define LOG_ERROR(format, ...) __INTERNAL("ERROR", "\x1b[31m", format, ##__VA_ARGS__)
-#define LOG_WARN(format, ...) __INTERNAL("WARN", "\x1b[33m", format, ##__VA_ARGS__)
-#define LOG_INFO(format, ...) __INTERNAL("INFO", "\x1b[32m", format, ##__VA_ARGS__)
+#define LOG_ERROR(fmt, ...) __INTERNAL("ERROR", RED,    fmt, ##__VA_ARGS__)
+#define LOG_WARN(fmt, ...)  __INTERNAL("WARN",  YELLOW, fmt, ##__VA_ARGS__)
+#define LOG_INFO(fmt, ...)  __INTERNAL("INFO",  GREEN,  fmt, ##__VA_ARGS__)
 
 #ifndef NDEBUG
-    #define LOG_DEBUG(format, ...) __INTERNAL("DEBUG", "\x1b[36m", format, ##__VA_ARGS__)
-#else 
-    #define LOG_DEBUG(format, ...) (void(0))
-#endif // !NDEBUG
-
+    #define LOG_DEBUG(fmt, ...) __INTERNAL("DEBUG", BLUE, fmt, ##__VA_ARGS__)
+#else
+    #define LOG_DEBUG(fmt, ...) (void(0))
+#endif
