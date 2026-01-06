@@ -110,18 +110,41 @@ public:
 
 #ifdef ENABLE_LOGGING
 
-    #define __INTERNAL(level_str, color, fmt, ...)                                 \
-        do {                                                                       \
-            std::string time = __GetCurrentTimestamp();                            \
-            std::string filename = __GetFileName(__FILE__);                        \
-            int line = __LINE__;                                                   \
-            std::string prefix = std::format("{}[{}][{}:{}][{}] ",                 \
-                                    color, time, filename, line, level_str);       \
-            std::string content = std::format(fmt, ##__VA_ARGS__);                 \
-            auto msg = prefix + content + "\n" + RESET;                            \
-            std::cout << msg;                                                      \
-            Logging::write(msg);                                                   \
+#if HAS_STD_FORMAT
+
+    #define __INTERNAL(level_str, color, fmt, ...)                                  \
+        do {                                                                        \
+            std::string time = __GetCurrentTimestamp();                             \
+            std::string filename = __GetFileName(__FILE__);                         \
+            int line = __LINE__;                                                    \
+            std::string prefix = std::format(                                       \
+                "{}[{}][{}:{}][{}] ",                                               \
+                color, time, filename, line, level_str                              \
+            );                                                                      \
+            std::string content = std::format(fmt __VA_OPT__(, __VA_ARGS__));       \
+            auto msg = prefix + content + "\n" + RESET;                             \
+            std::cout << msg;                                                       \
+            Logging::write(msg);                                                    \
         } while (0)
+
+#else
+
+    #define __INTERNAL(level_str, color, fmt, ...)                                  \
+        do {                                                                        \
+            std::string time = __GetCurrentTimestamp();                             \
+            std::string filename = __GetFileName(__FILE__);                         \
+            int line = __LINE__;                                                    \
+            std::string prefix = "[" + time + "][" + filename + ":"                 \
+                               + std::to_string(line) + "][" + level_str + "] ";    \
+            std::string content = fmt;                                              \
+            std::string warn = std::string(YELLOW) + "[std::format not available]"  \
+                               + std::string(RESET);                                \
+            auto msg = color + prefix + warn + content + "\n" + RESET;              \
+            std::cout << msg;                                                       \
+            Logging::write(msg);                                                    \
+        } while (0)
+
+#endif
 #else
     #define __INTERNAL(level_str, color, fmt, ...) (void(0))
 #endif // ENABLE_LOGGING

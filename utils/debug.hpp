@@ -9,7 +9,6 @@
 #include <source_location>
 #include <mutex>
 #include <thread>
-#include <format>
 #include "formatter.hpp"
 
 
@@ -43,7 +42,7 @@ public:
             }
 
             std::cerr << "\t[Stacktrace]" << "\n";
-            #if __has_include(<stacktrace>)
+            #if defined(__cpp_lib_stacktrace)
                 auto trace = std::stacktrace::current();
                 for (std::size_t i = 1; i < trace.size(); ++i)
                     std::cerr << "\t\t" << trace[i] << '\n';
@@ -71,7 +70,11 @@ private:
         os << type_name<T>() << " "
            << var.first
            << " [addr: " << &var.second << "] = "
+        #if HAS_STD_FORMAT
            << std::format("{}", var.second);
+        #else
+           << "\x1b[33m[unformattable type]\x1b[0m";
+        #endif
         return os;
     }
 

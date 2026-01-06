@@ -13,6 +13,7 @@
 // Profiling tools (timers, performance measurement, etc.)
 #include "profiling.hpp"
 
+// String formatting utilities
 #include "formatter.hpp"
 
 #endif // !UTILS_H

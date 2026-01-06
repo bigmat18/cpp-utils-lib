@@ -4,15 +4,13 @@
 #include <type_traits>
 #include <ranges>
 #include <concepts>
-#include <format>
 
-template <typename T>
-concept Formattable = requires(T v, std::format_context& ctx) {
-    std::formatter<std::remove_cvref_t<T>>{}.format(v, ctx);
-};
-
-template <typename... Ts>
-concept AllFormattable = (Formattable<Ts> && ...);
+#if __has_include(<format>)
+  #include <format>
+  #define HAS_STD_FORMAT 1
+#else
+  #define HAS_STD_FORMAT 0
+#endif
 
 template <typename T>
 constexpr std::string_view type_name() {
@@ -37,6 +35,15 @@ constexpr std::string_view type_name() {
     #endif
 }
 
+#if HAS_STD_FORMAT
+
+template <typename T>
+concept Formattable = requires(T v, std::format_context& ctx) {
+    std::formatter<std::remove_cvref_t<T>>{}.format(v, ctx);
+};
+
+template <typename... Ts>
+concept AllFormattable = (Formattable<Ts> && ...);
 
 template <typename T1, typename T2> 
 struct std::formatter<std::pair<T1, T2>> : std::formatter<std::string> {
@@ -82,4 +89,14 @@ struct std::formatter<R> : std::formatter<std::string> {
     }
 };
 
+#else
 
+template <typename T>
+concept Formattable = true;
+
+template <typename... Ts>
+concept AllFormattable = true;
+
+#pragma message("<formatter> std::format not available - Formattable concepts disabled")
+
+#endif

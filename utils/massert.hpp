@@ -36,7 +36,7 @@ public:
 
             std::cerr << "\t[Stacktrace]\n";
 
-            #if __has_include(<stacktrace>) 
+            #if defined(__cpp_lib_stacktrace)
                 auto trace = std::stacktrace::current();
                 for (std::size_t i = 1; i < trace.size(); ++i) {
                     std::cerr << "\t\t" << trace[i] << '\n';
@@ -75,6 +75,6 @@ private:
             assert((condition) && message)
         #endif
 #else
-    #define massert(condition, message) ((void)0)
+    #define massert(condition, message) (condition)
 #endif
 
