@@ -25,6 +25,9 @@ if(CPPUTILS_USE_OPENMP)
     if(OpenMP_CXX_FOUND)
         target_link_libraries(cpp-utils-lib INTERFACE OpenMP::OpenMP_CXX)
         target_compile_definitions(cpp-utils-lib INTERFACE USE_OPENMP)
+        target_link_libraries(cpp-utils-lib INTERFACE 
+            $<$<STREQUAL:${CMAKE_SYSTEM_NAME},Linux>:stdc++exp>
+        )
     endif()
 endif()
 

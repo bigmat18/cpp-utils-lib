@@ -1,6 +1,7 @@
 #pragma once
 
 #include "massert.hpp"
+#include "formatter.hpp"
 #include <algorithm>
 #include <cstdio>
 #include <ctime>
@@ -17,6 +18,11 @@ inline std::string __GetFileName(const char* path) {
         if (*p == '/' || *p == '\\') file = p + 1;
     }
     return std::string(file);
+}
+
+inline std::mutex& __GetLogMutex() {
+    static std::mutex mtx;
+    return mtx;
 }
 
 inline std::string __GetCurrentTimestamp() {
@@ -123,8 +129,11 @@ public:
             );                                                                      \
             std::string content = std::format(fmt __VA_OPT__(, __VA_ARGS__));       \
             auto msg = prefix + content + "\n" + RESET;                             \
-            std::cout << msg;                                                       \
-            Logging::write(msg);                                                    \
+            {                                                                       \
+                std::lock_guard<std::mutex> lock(__GetLogMutex());                  \
+                std::cout << msg << std::flush;                                     \
+                Logging::write(msg);                                                \
+            }                                                                       \ 
         } while (0)
 
 #else
@@ -140,8 +149,11 @@ public:
             std::string warn = std::string(YELLOW) + "[std::format not available]"  \
                                + std::string(RESET);                                \
             auto msg = color + prefix + warn + content + "\n" + RESET;              \
-            std::cout << msg;                                                       \
-            Logging::write(msg);                                                    \
+            {                                                                       \
+                std::lock_guard<std::mutex> lock(__GetLogMutex());                  \
+                std::cout << msg << std::flush;                                     \
+                Logging::write(msg);                                                \
+            }                                                                       \
         } while (0)
 
 #endif
