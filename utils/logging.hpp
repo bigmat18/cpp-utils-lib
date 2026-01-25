@@ -84,9 +84,10 @@ public:
     }
 
     static void write(std::string msg) { 
-        std::lock_guard<std::mutex> lock(s_Mutex);
-        if (s_IsInit)
+        if (s_IsInit) {
+            std::lock_guard<std::mutex> lock(s_Mutex);
             instance().m_Buffer << msg; 
+        }
     }
 
     Logging() = default;
